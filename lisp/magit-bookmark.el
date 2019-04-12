@@ -46,6 +46,7 @@ and the buffer-local values of the variables referenced in its
       (let ((bookmark (bookmark-make-record-default 'no-file)))
         (bookmark-prop-set bookmark 'handler  'magit--handle-bookmark)
         (bookmark-prop-set bookmark 'mode     major-mode)
+        (bookmark-prop-set bookmark 'section  nil) ; TODO (magit-current-section))
         (bookmark-prop-set bookmark 'filename (magit-toplevel))
         (bookmark-prop-set bookmark 'defaults (list (magit-bookmark-name)))
         (dolist (var (get major-mode 'magit-bookmark-variables))

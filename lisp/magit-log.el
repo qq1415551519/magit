@@ -496,7 +496,8 @@ the upstream isn't ahead of the current branch) show."
 
 (cl-defmethod transient-init-value ((obj magit-log-prefix))
   (pcase-let ((`(,args ,files)
-               (magit-log--initial-value 'mode-value 'magit-log-mode)))
+               (magit-log--initial-value 'mode-value 'magit-log-mode
+                                         magit-prefix-use-buffer-arguments)))
     (oset obj value (if files `(("--" ,@files) ,args) args))))
 
 (cl-defmethod transient-init-value ((obj magit-log-refresh-prefix))
@@ -505,14 +506,14 @@ the upstream isn't ahead of the current branch) show."
                         ,magit-buffer-log-args)
                     magit-buffer-log-args)))
 
-(defun magit-log--initial-value (slot mode)
+(defun magit-log--initial-value (slot mode sticky-args)
   (let (args files)
     (cond
-     ((and magit-use-sticky-arguments
+     ((and sticky-args
            (derived-mode-p mode))
       (setq args  magit-buffer-log-args)
       (setq files magit-buffer-log-files))
-     ((and (eq magit-use-sticky-arguments t)
+     ((and (eq sticky-args t)
            (when-let ((buffer (magit-mode-get-buffer mode)))
              (setq args  (buffer-local-value 'magit-buffer-log-args buffer))
              (setq files (buffer-local-value 'magit-buffer-log-files buffer))
@@ -544,7 +545,8 @@ the upstream isn't ahead of the current branch) show."
       (pcase-let ((`(,args ,alist)
                    (transient-args nil t)))
         (list args (cdr (assoc "--" alist))))
-    (magit-log--initial-value 'mode-value (or mode 'magit-log-mode))))
+    (magit-log--initial-value 'mode-value (or mode 'magit-log-mode)
+                              magit-direct-use-buffer-arguments)))
 
 (defun magit-log-refresh-assert ()
   (cond ((derived-mode-p 'magit-reflog-mode)

@@ -771,7 +771,8 @@ and `:slant'."
 
 (cl-defmethod transient-init-value ((obj magit-diff-prefix))
   (pcase-let ((`(,args ,files)
-               (magit-diff--initial-value 'mode-value 'magit-diff-mode)))
+               (magit-diff--initial-value 'mode-value 'magit-diff-mode
+                                          magit-prefix-use-buffer-arguments)))
     (oset obj value (if files `(("--" ,@files) ,args) args))))
 
 (cl-defmethod transient-init-value ((obj magit-diff-refresh-prefix))
@@ -780,14 +781,14 @@ and `:slant'."
                         ,magit-buffer-diff-args)
                     magit-buffer-diff-args)))
 
-(defun magit-diff--initial-value (slot mode)
+(defun magit-diff--initial-value (slot mode sticky-args)
   (let (args files)
     (cond
-     ((and magit-use-sticky-arguments
+     ((and sticky-args
            (derived-mode-p mode))
       (setq args  magit-buffer-diff-args)
       (setq files magit-buffer-diff-files))
-     ((and (eq magit-use-sticky-arguments t)
+     ((and (eq sticky-args t)
            (when-let ((buffer (magit-mode-get-buffer mode)))
              (setq args  (buffer-local-value 'magit-buffer-diff-args buffer))
              (setq files (buffer-local-value 'magit-buffer-diff-files buffer))
@@ -819,7 +820,8 @@ and `:slant'."
       (pcase-let ((`(,args ,alist)
                    (transient-args nil t)))
         (list args (cdr (assoc "--" alist))))
-    (magit-diff--initial-value 'mode-value (or mode 'magit-diff-mode))))
+    (magit-diff--initial-value 'mode-value (or mode 'magit-diff-mode)
+                               magit-direct-use-buffer-arguments)))
 
 ;;;; Infix Arguments
 
