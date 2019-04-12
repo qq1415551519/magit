@@ -390,7 +390,10 @@ the upstream isn't ahead of the current branch) show."
     ("x" "toggle shortstat"         magit-toggle-log-margin-style)]]
   (interactive)
   (cond ((not (eq current-transient-command 'magit-log-refresh))
-         (magit-log-refresh-assert)
+         (cond ((derived-mode-p 'magit-reflog-mode)
+                (user-error "Cannot change log arguments in reflog buffers"))
+               ((derived-mode-p 'magit-cherry-mode)
+                (user-error "Cannot change log arguments in cherry buffers")))
          (transient-setup 'magit-log-refresh))
         (t
          (pcase-let ((`(,args ,files) (magit-log-arguments)))
@@ -477,12 +480,6 @@ the upstream isn't ahead of the current branch) show."
         (list args (cdr (assoc "--" alist))))
     (magit-log--initial-value 'mode-value (or mode 'magit-log-mode)
                               magit-direct-use-buffer-arguments)))
-
-(defun magit-log-refresh-assert ()
-  (cond ((derived-mode-p 'magit-reflog-mode)
-         (user-error "Cannot change log arguments in reflog buffers"))
-        ((derived-mode-p 'magit-cherry-mode)
-         (user-error "Cannot change log arguments in cherry buffers"))))
 
 ;;;; Infix Arguments
 
