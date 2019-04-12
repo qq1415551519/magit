@@ -610,6 +610,11 @@ Magit is documented in info node `(magit)'."
 (put 'magit-buffer-revision 'permanent-local t)
 (put 'magit-buffer-revision-hash 'permanent-local t)
 
+(put 'magit-buffer-diff-file-args 'safe-local-variable
+     (lambda (val)
+       (and (listp val)
+            (-all-p #'stringp val))))
+
 (defvar-local magit-refresh-args nil
   "Obsolete.  Possibly the arguments used to refresh the current buffer.
 Some third-party packages might still use this, but Magit does not.")
