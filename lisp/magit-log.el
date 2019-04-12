@@ -389,13 +389,14 @@ the upstream isn't ahead of the current branch) show."
     ("d" "toggle details"           magit-toggle-margin-details)
     ("x" "toggle shortstat"         magit-toggle-log-margin-style)]]
   (interactive)
-  (if (not (eq current-transient-command 'magit-log-refresh))
-      (transient-setup 'magit-log-refresh)
-    (magit-log-refresh-assert)
-    (pcase-let ((`(,args ,files) (magit-log-arguments)))
-      (setq magit-buffer-log-args args)
-      (setq magit-buffer-log-files files)) ; FIXME log-select
-    (magit-refresh)))
+  (cond ((not (eq current-transient-command 'magit-log-refresh))
+         (magit-log-refresh-assert)
+         (transient-setup 'magit-log-refresh))
+        (t
+         (pcase-let ((`(,args ,files) (magit-log-arguments)))
+           (setq magit-buffer-log-args args)
+           (setq magit-buffer-log-files files)) ; FIXME log-select
+         (magit-refresh))))
 
 (cl-defmethod transient-set-value ((_ magit-log-refresh-prefix))
   (magit-log--set-value))
